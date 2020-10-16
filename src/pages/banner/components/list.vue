@@ -46,6 +46,7 @@
 </template>
 <script>
 var x=10;
+var y=20;
 import { mapGetters, mapActions } from "vuex";
 import { successAlert, warningAlert } from "../../../utils/alert";
 import { reqGoodsDel } from "../../../utils/request";
