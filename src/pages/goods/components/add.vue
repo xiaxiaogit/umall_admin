@@ -44,21 +44,17 @@
         </el-form-item>
 
         <el-form-item label="图片" label-width="80px">
+
           <div class="my-upload">
-            <h3>+</h3>
-            <img :src="imgUrl" class="img" alt="" />
-            <input class="my-input" type="file" @change="getFile" />
-          </div>
-          <!-- <div class="my-upload">
             <h3>+</h3>
             <img class="img" v-if="imgUrl" :src="imgUrl" alt="" />
             <input
-              v-if="info.isshow"
+              v-if="info.isshow"   
               class="my-input"
               type="file"
               @change="getFile"
             />
-          </div> -->
+          </div>
         </el-form-item>
 
         <el-form-item label="商品规格" label-width="80px">
@@ -194,7 +190,7 @@ export default {
     //获得二级分类list
     getSecondList() {
       reqCateList({ pid: this.form.first_cateid }).then(res => {
-        console.log(res);
+        // console.log(res);//  res.data.list得到的直接就是二级分类下的内容
         //二级分类list
         this.secondCateList = res.data.list;
       });
@@ -280,7 +276,7 @@ export default {
         status: 1
       };
       //二级分类的list
-      this.secondCateLis = [];
+      this.secondCateList = [];
       this.imgUrl = "";
       //商品属性list
       this.goodsAttrList = [];
@@ -290,7 +286,7 @@ export default {
       //发请求
       reqGoodsDetail(id).then(res => {
         if (res.data.code == 200) {
-          console.log(res);
+          // console.log(res);
           this.form = res.data.list;
           //   补id
           this.form.id = id;

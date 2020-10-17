@@ -1,21 +1,20 @@
 import {
-  reqCateList
+  reqBannerList
 } from "../../utils/request"
+
 const state = {
-  // 菜单的list
   list: []
 }
+
 const mutations = {
-  //修改list
   changeList(state, arr) {
-    state.list = arr;
+    state.list = arr
   }
 }
+
 const actions = {
-  //页面请求
   reqListAction(context) {
-    //发请求
-    reqCateList({istree: true}).then(res => {
+    reqBannerList().then(res => {
       let list = res.data.list ? res.data.list : []
       context.commit("changeList", list)
     })
@@ -34,5 +33,4 @@ export default {
   actions,
   getters,
   namespaced: true
-
 }

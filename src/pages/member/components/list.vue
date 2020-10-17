@@ -53,19 +53,6 @@ export default {
     edit(uid) {
       this.$emit("edit", uid);
     },
-    
-    //删除2
-    dele(id) {
-      //点了确定按钮
-      reqMenuDel(id).then((res) => {
-        if (res.data.code == 200) {
-          successAlert(res.data.msg);
-          this.reqListAction();
-        } else {
-          warningAlert(res.data.msg);
-        }
-      });
-    },
   },
   mounted() {
     this.reqMemberListAction();

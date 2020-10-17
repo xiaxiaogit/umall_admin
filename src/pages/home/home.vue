@@ -47,7 +47,16 @@ export default {
               {
                 name: "销量",
                 type: "bar",
-                data: this.list.map((item) => item.children.length),
+                data: this.list.map((item) =>
+                 { console.log(item.children)
+                 if(item.children===undefined){
+                   return 0
+                 }else{
+                    return item.children.length
+                 }
+                     
+                 }
+                 ),
               },
             ],
           };

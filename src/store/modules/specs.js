@@ -30,10 +30,7 @@ const mutations = {
 const actions = {
   //页面请求
   reqListAction(context, bool) {
-    let params = bool ? {} : {
-      page: context.state.page,
-      size: context.state.size
-    }
+    let params = bool ? {} : {page: context.state.page,size: context.state.size,}
     //发请求
     reqSpecsList(params).then(res => {
       //如果去list的时候，取到null,那么有可能是最后一页没数据了，需要减一页，再次请求list

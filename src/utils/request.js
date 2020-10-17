@@ -1,6 +1,11 @@
 import axios from 'axios'
 import qs from 'qs'
 import Vue from "vue"
+import store from "../store"
+import router from "../router"
+import {
+  warningAlert
+} from "./alert"
 
 //开发环境使用
 Vue.prototype.$imgPre = "http://localhost:3000"
@@ -12,12 +17,29 @@ let baseURL = "/api";
 // Vue.prototype.$imgPre = ""
 // let baseURL = "";
 
+//请求拦截  后台 app.js 后端登录拦截打开
+axios.interceptors.request.use(req => {
+  // console.log("---请求拦截----");
+  // console.log(req);
+  if (req.url != baseURL + "/api/userlogin") {
+    req.headers.authorization = store.state.userInfo.token;
+  }
+  return req;
+})
+
+
+
 //响应拦截
 axios.interceptors.response.use(res => {
   console.group("=====本次请求路径是:" + res.config.url)
   console.log(res);
   console.groupEnd()
 
+  //用户掉线了
+  if (res.data.msg == "登录已过期或访问权限受限") {
+    warningAlert(res.data.mag)
+    router.push("/login")
+  }
   return res;
 })
 /*********菜单管理***************/
@@ -404,5 +426,63 @@ export const reqMemberUpdate = (params) => {
     url: baseURL + "/api/memberedit",
     method: "post",
     data: qs.stringify(params)
+  })
+}
+
+/*********轮播图修改***************/
+//列表
+export const reqBannerList = () => {
+  return axios({
+    url: baseURL + "/api/bannerlist",
+    method: "get"
+  })
+}
+
+
+//添加
+export const reqBannerAdd = (params) => {
+  let data = new FormData();
+  for (let i in params) {
+    data.append(i, params[i])
+  }
+  return axios({
+    url: baseURL + "/api/banneradd",
+    method: "post",
+    data: data
+  })
+}
+
+//1条
+export const reqBannerDetail = (id) => {
+  return axios({
+    url: baseURL + "/api/bannerinfo",
+    method: "get",
+    params: {
+      id: id
+    }
+  })
+}
+
+//修改
+export const reqBannerUpdate = (params) => {
+  let data = new FormData()
+  for (let i in params) {
+    data.append(i, params[i])
+  }
+  return axios({
+    url: baseURL + "/api/banneredit",
+    method: "post",
+    data: data
+  })
+}
+
+//删除
+export const reqBannerDel = (id) => {
+  return axios({
+    url: baseURL + "/api/bannerdelete",
+    method: "post",
+    data: qs.stringify({
+      id: id
+    })
   })
 }

@@ -1,21 +1,17 @@
 <template>
   <div>
-    <el-table
-      :data="list"
-      border
-      row-key="id"
-      style="width: 100%"
-      :tree-props="{ children: 'children' }"
-    >
+    <el-table :data="list" border row-key="id" style="width: 100%">
       <el-table-column prop="id" label="编号" width="180"> </el-table-column>
 
-      <el-table-column prop="goodsname" label="轮播图标题" width="180">
+      <el-table-column prop="title" label="轮播图标题" width="180">
       </el-table-column>
 
       <el-table-column label="图片">
         <template slot-scope="scope">
-          <span>{{ scope.row.price | filterPrice }}</span>
+          <img :src="$imgPre+scope.row.img"
+          alt="" class="img" />
         </template>
+
       </el-table-column>
       <el-table-column prop="name" label="状态">
         <template slot-scope="scope">
@@ -26,30 +22,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="status" label="操作">
+      <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button type="primary" @click="edit(scope.row.id)">编辑</el-button>
           <del-btn @confirm="dele(scope.row.id)"></del-btn>
         </template>
       </el-table-column>
     </el-table>
-
-    <el-pagination
-      background
-      layout="prev, pager, next"
-      :total="total"
-      :page-size="size"
-      @current-change="changePage"
-    >
-    </el-pagination>
   </div>
 </template>
 <script>
-var x=10;
-var y=20;
 import { mapGetters, mapActions } from "vuex";
 import { successAlert, warningAlert } from "../../../utils/alert";
-import { reqGoodsDel } from "../../../utils/request";
+import { reqBannerList, reqBannerDel } from "../../../utils/request";
 export default {
   props: [],
   components: {},
@@ -58,16 +43,12 @@ export default {
   },
   computed: {
     ...mapGetters({
-      list: "goods/list",
-      size: "goods/size",
-      total: "goods/total",
-    }),
+      list: "banner/list"
+    })
   },
   methods: {
     ...mapActions({
-      reqListAction: "goods/reqListAction",
-      reqTotalAction: "goods/reqTotalAction",
-      changePageAction: "goods/changePageAction",
+      reqListAction: "banner/reqListAction"
     }),
     //编辑
     edit(id) {
@@ -76,28 +57,21 @@ export default {
     //删除2
     dele(id) {
       //点了确定按钮
-      reqGoodsDel(id).then((res) => {
+      reqBannerDel(id).then(res => {
+        console.log(res);
         if (res.data.code == 200) {
           successAlert(res.data.msg);
           this.reqListAction();
-          //重新获取总数
-          this.reqTotalAction();
         } else {
           warningAlert(res.data.msg);
         }
       });
-    },
-    //修改了当前页码
-    changePage(e) {
-      this.changePageAction(e);
-    },
+    }
   },
   mounted() {
     //获取的list
     this.reqListAction();
-    //获取list的总数
-    this.reqTotalAction();
-  },
+  }
 };
 </script>
 <style scoped>
