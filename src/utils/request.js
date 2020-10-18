@@ -334,6 +334,7 @@ export const reqSpecsUpdate = (params) => {
 }
 
 /*********商品管理***************/
+//添加
 export const reqGoodsAdd = (params) => {
   let data = new FormData();
   for (let i in params) {
@@ -480,6 +481,55 @@ export const reqBannerUpdate = (params) => {
 export const reqBannerDel = (id) => {
   return axios({
     url: baseURL + "/api/bannerdelete",
+    method: "post",
+    data: qs.stringify({
+      id: id
+    })
+  })
+}
+
+/*********秒杀活动***************/
+//添加
+export const reqSeckAdd = (params) => {
+  return axios({
+    url: baseURL + "/api/seckadd",
+    method: "post",
+    data: qs.stringify(params)
+  })
+}
+
+//列表
+export const reqSeckList = () => {
+  return axios({
+    url: baseURL + "/api/secklist",
+    method: "get"
+  })
+}
+
+//1条
+export const reqSeckDetail = (id) => {
+  return axios({
+    url: baseURL + "/api/seckinfo",
+    method: "get",
+    params: {
+      id: id
+    }
+  })
+}
+
+//修改
+export const reqSeckUpdate = (params) => {
+  return axios({
+    url: baseURL + "/api/seckedit",
+    method: "post",
+    data: qs.stringify(params)
+  })
+}
+
+//删除
+export const reqSeckDel = (id) => {
+  return axios({
+    url: baseURL + "/api/seckdelete",
     method: "post",
     data: qs.stringify({
       id: id

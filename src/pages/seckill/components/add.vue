@@ -6,12 +6,13 @@
       @closed="close"
     >
       <el-form ref="form" :model="form" label-width="80px">
-        <el-form-item label="分类名称">
-          <el-input v-model="form.catename"></el-input>
+        <el-form-item label="活动名称">
+          <el-input v-model="form.title"></el-input>
         </el-form-item>
 
         <el-form-item label="活动期限">
           <el-date-picker
+            @change="changeT"
             v-model="value1"
             type="daterange"
             range-separator="至"
@@ -22,10 +23,13 @@
         </el-form-item>
 
         <el-form-item label="一级分类">
-          <el-select v-model="form.pid" placeholder="请选择上级分类">
-            <el-option label="顶级分类" :value="0"></el-option>
+          <el-select
+            v-model="form.first_cateid"
+            @change="changeFirst"
+            placeholder="请选择一级分类"
+          >
             <el-option
-              v-for="item in list"
+              v-for="item in firstList"
               :key="item.id"
               :label="item.catename"
               :value="item.id"
@@ -34,10 +38,13 @@
         </el-form-item>
 
         <el-form-item label="二级分类">
-          <el-select v-model="form.pid" placeholder="请选择上级分类">
-            <el-option label="顶级分类" :value="0"></el-option>
+          <el-select
+            v-model="form.second_cateid"
+            @change="changeSecond"
+            placeholder="请选择二级分类"
+          >
             <el-option
-              v-for="item in list"
+              v-for="item in secondList"
               :key="item.id"
               :label="item.catename"
               :value="item.id"
@@ -46,12 +53,11 @@
         </el-form-item>
 
         <el-form-item label="商品">
-          <el-select v-model="form.pid" placeholder="请选择上级分类">
-            <el-option label="顶级分类" :value="0"></el-option>
+          <el-select v-model="form.goodsid" placeholder="请选择商品">
             <el-option
-              v-for="item in list"
+              v-for="item in goodsList"
               :key="item.id"
-              :label="item.catename"
+              :label="item.goodsname"
               :value="item.id"
             ></el-option>
           </el-select>
@@ -80,85 +86,86 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import {
-  reqCateAdd,
-  reqCateDetail,
-  reqCateUpdate
+  reqCateList,
+  reqSeckAdd,
+  reqSeckDetail,
+  reqSeckUpdate,
+  reqGoodsList
 } from "../../../utils/request";
 import { successAlert, warningAlert } from "../../../utils/alert";
 
 export default {
   props: ["info"],
   components: {},
-   data() {
-      return {
-           form: {
-        id: "1",
+  data() {
+    return {
+      form: {
         title: "",
-        img: null,
+        begintime: "",
+        endtime: "",
+        first_cateid: "",
+        second_cateid: "",
+        goodsid: "",
         status: 1
       },
-        pickerOptions: {
-          shortcuts: [{
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit('pick', [start, end]);
-            }
-          }]
-        },
-        value1: '',
-        value2: ''
-      };
-    },
+      value1: [],
+      //二级分类的list
+      secondList: [],
+      //商品list
+      goodsList: []
+    };
+  },
   computed: {
     ...mapGetters({
-      list: "cate/list"
+      list: "seckill/list",
+      //商品一级分类
+      firstList: "cate/list"
     })
   },
   methods: {
     ...mapActions({
-      reqListAction: "cate/reqListAction"
+      reqListAction: "seckill/reqListAction",
+      //商品分类
+      reqCateAction: "cate/reqListAction"
     }),
-    //获取文件
-    getFile(e) {
-      let file = e.target.files[0];
-      //1.大小不超过2M 1M=1024KB 1KB=1024B
-      if (file.size > 2 * 1024 * 1024) {
-        warningAlert("文件不能超过2M");
-        return;
-      }
+    //一级分类修改了，获取二级分类的list
+    changeFirst() {
+      this.form.second_cateid = "";
+      this.getSecondList();
+    },
+    //获得二级分类list
+    getSecondList() {
+      // 方法1:通过一级菜单里的id获取当前二级菜单列表,赋值给secondList
+      let obj = this.firstList.find(item => item.id == this.form.first_cateid)
+        .children;
+      this.secondList = obj;
 
-      //2.是图片
-      let imgExtArr = [".jpg", ".png", ".jpeg", ".gif"];
-      let extname = file.name.slice(file.name.lastIndexOf("."));
+      //方法2: 发pid给后端,返回当前分类下的二级分类
+      // reqCateList({ pid: this.form.first_cateid }).then(res => {
+      //   this.secondList = res.data.list;
+      //   console.log(this.secondList);
+      // });
+    },
+    //获取三级分类商品list
+    changeSecond() {
+      this.form.goodsid = "";
+      this.getThirdList();
+    },
 
-      if (!imgExtArr.some(item => item == extname)) {
-        warningAlert("文件格式不正确");
-        return;
-      }
-      //URL.creatObjectURL() 可以通过文件生成一个地址
-      this.imgUrl = URL.createObjectURL(file);
-
-      //将文件保存在form.img
-      this.form.img = file;
+    getThirdList() {
+      reqGoodsList({
+        fid: this.form.first_cateid,
+        sid: this.form.second_cateid
+      }).then(res => {
+        this.goodsList = res.data.list.filter(
+          item => item.second_cateid == this.form.second_cateid
+        );
+        this.goodsList = res.data.list;
+      });
+    },
+    changeT() {
+      this.form.begintime = this.value1[0].getTime();
+      this.form.endtime = this.value1[1].getTime();
     },
 
     //弹框消失
@@ -174,17 +181,24 @@ export default {
     },
     //数据重置
     empty() {
-      this.form = {
-        pid: 0,
-        catename: "",
-        img: null,
+      (this.form = {
+        title: "",
+        begintime: "",
+        endtime: "",
+        first_cateid: "",
+        second_cateid: "",
+        goodsid: "",
         status: 1
-      };
-      this.imgUrl = "";
+      }),
+        (this.value1 = []),
+        //二级分类的list
+        (this.secondList = []),
+        //商品list
+        (this.goodsList = []);
     },
     //点击了添加按钮
     add() {
-      reqCateAdd(this.form).then(res => {
+      reqSeckAdd(this.form).then(res => {
         if (res.data.code == 200) {
           successAlert(res.data.msg);
 
@@ -204,13 +218,19 @@ export default {
     //获取菜单详情 （1条）
     look(id) {
       //发请求
-      reqCateDetail(id).then(res => {
-        console.log(res);
+      reqSeckDetail(id).then(res => {
+        // this.form.value1 = [new Date(parseInt(this.form.begintime)),new Date(parseInt(this.form.endtime))]
         if (res.data.code == 200) {
-          //这个时候form是没有id的
+          this.value1 = [
+            parseInt(res.data.list.begintime),
+            parseInt(res.data.list.endtime)
+          ];
           this.form = res.data.list;
+          //这个时候form是没有id的
           this.form.id = id;
-          this.imgUrl = this.$imgPre + this.form.img;
+          this.getSecondList();
+          this.getThirdList();
+          console.log(this.form.id);
         } else {
           warningAlert(res.data.msg);
         }
@@ -218,19 +238,25 @@ export default {
     },
     //修改
     update() {
-      reqCateUpdate(this.form).then(res => {
+      // this.form.begintime = new Date(this.value1[0]).getTime();
+      // this.form.endtime = new Date(this.value1[1]).getTime();
+      reqSeckUpdate(this.form).then(res => {
         if (res.data.code == 200) {
           successAlert(res.data.msg);
           this.empty();
           this.cancel();
-          this.reqListAction();
+          // this.reqListAction();
         } else {
           warningAlert(res.data.msg);
         }
       });
     }
   },
-  mounted() {}
+  mounted() {
+    if (this.firstList.length == 0) {
+      this.reqCateAction();
+    }
+  }
 };
 </script>
 <style lang="stylus" scoped>

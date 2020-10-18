@@ -6,7 +6,7 @@
     border
     :tree-props="{ children: 'children' }"
   >
-    <el-table-column prop="id" label="活动名称" sortable width="180">
+    <el-table-column prop="title" label="活动名称" sortable width="180">
     </el-table-column>
 
     <el-table-column label="状态">
@@ -27,7 +27,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { successAlert, warningAlert } from "../../../utils/alert";
-import { reqCateDel } from "../../../utils/request";
+import { reqSeckDel } from "../../../utils/request";
 export default {
   props: [],
   components: {},
@@ -36,12 +36,12 @@ export default {
   },
   computed: {
     ...mapGetters({
-      list: "cate/list"
+      list: "seckill/list"
     })
   },
   methods: {
     ...mapActions({
-      reqListAction: "cate/reqListAction"
+      reqListAction: "seckill/reqListAction"
     }),
     //编辑
     edit(id) {
@@ -50,7 +50,7 @@ export default {
     //删除2
     dele(id) {
       //点了确定按钮
-      reqCateDel(id).then(res => {
+      reqSeckDel(id).then(res => {
         if (res.data.code == 200) {
           successAlert(res.data.msg);
           this.reqListAction();

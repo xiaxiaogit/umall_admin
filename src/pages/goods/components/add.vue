@@ -63,7 +63,7 @@
             <el-option
               v-for="item in specsList"
               :key="item.id"
-              :label="item.spacename"
+              :label="item.specsname"
               :value="item.id"
             ></el-option>
           </el-select>
@@ -204,6 +204,7 @@ export default {
     },
     //获得商品属性数组
     getAttrsArr() {
+      console.log(this.specsList );
       // this.form.specsid 颜色 1
       // 在specsList中找到 找到哪一条数据的id和当前this.form.specsid是一样的。
       let obj = this.specsList.find(item => item.id == this.form.specsid);
