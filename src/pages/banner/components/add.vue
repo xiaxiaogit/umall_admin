@@ -71,14 +71,12 @@ export default {
   data() {
     return {
       form: {
-        id: "",
         title: "",
         img: null,
         status: 1
       },
       //图片地址
       imgUrl: ""
-      // imageUrl: ""
     };
   },
   computed: {
@@ -87,9 +85,6 @@ export default {
     })
   },
   methods: {
-    handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
-    },
     ...mapActions({
       //列表
       reqListAction: "banner/reqListAction"
@@ -98,20 +93,12 @@ export default {
     //图片操作
     getFile(e) {
       let file = e.target.files[0];
-      // let file = e.raw;
-      // if (file.size > 2 * 1024 * 1024) {
-      //   warningAlert("文件不能超过2M");
-      //   return;
-      // }
 
       this.imgUrl = URL.createObjectURL(file);
-
       this.form.img = file;
- 
     },
     // 点击了添加按钮
     add() {
-      console.log(this.form);
       reqBannerAdd(this.form).then(res => {
         if (res.data.code == 200) {
           //成功
@@ -149,16 +136,15 @@ export default {
         img: null,
         status: 1
       };
+      this.imgUrl= "";
     },
     //获取菜单详情 （1条）
     look(id) {
       //发请求
       reqBannerDetail(id).then(res => {
-        // console.log(res);
         if (res.data.code == 200) {
-          console.log(res);
           this.form = res.data.list;
-          this.form.id = res.data.id;
+          this.form.id = id;
           //图片
           this.imgUrl = this.$imgPre + this.form.img;
         } else {
@@ -167,19 +153,17 @@ export default {
       });
     },
     //修改
-    update() {
+    update(id) {
       reqBannerUpdate(this.form).then(res => {
-        console.log(111);
-        // if (res.data.code == 200) {
-        //   this.form.id = res.data.id
-        //   console.log(res.data);
-        //   successAlert(res.data.msg);
-        //   this.empty();
-        //   this.cancel();
-        //   // this.reqListAction();
-        // } else {
-        //   warningAlert(res.data.msg);
-        // }
+        if (res.data.code == 200) {
+          this.form.id = res.data.id;
+          successAlert(res.data.msg);
+          this.empty();
+          this.cancel();
+          this.reqListAction();
+        } else {
+          warningAlert(res.data.msg);
+        }
       });
     }
   }
@@ -217,16 +201,6 @@ export default {
   left: 0;
   top: 0;
 }
-
-
-
-
-
-
-
-
-
-
 
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;

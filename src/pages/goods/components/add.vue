@@ -63,7 +63,7 @@
             <el-option
               v-for="item in specsList"
               :key="item.id"
-              :label="item.spacename"
+              :label="item.specsname"
               :value="item.id"
             ></el-option>
           </el-select>
