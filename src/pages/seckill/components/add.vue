@@ -160,6 +160,7 @@ export default {
         this.goodsList = res.data.list.filter(
           item => item.second_cateid == this.form.second_cateid
         );
+
         this.goodsList = res.data.list;
       });
     },
@@ -191,6 +192,7 @@ export default {
         status: 1
       }),
         (this.value1 = []),
+
         //二级分类的list
         (this.secondList = []),
         //商品list
@@ -230,7 +232,6 @@ export default {
           this.form.id = id;
           this.getSecondList();
           this.getThirdList();
-          console.log(this.form.id);
         } else {
           warningAlert(res.data.msg);
         }

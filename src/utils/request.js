@@ -523,6 +523,7 @@ export const reqSeckUpdate = (params) => {
     url: baseURL + "/api/seckedit",
     method: "post",
     data: qs.stringify(params)
+
   })
 }
 
